@@ -3,7 +3,7 @@
 	"package": "net.rober.mixin",
 	"compatibilityLevel": "JAVA_16",
 	"mixins": [
-		"ExampleMixin"
+		"ReplayScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
