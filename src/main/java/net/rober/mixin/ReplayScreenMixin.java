@@ -2,13 +2,16 @@ package net.rober.mixin;
 
 import com.replaymod.lib.de.johni0702.minecraft.gui.element.GuiButton;
 import com.replaymod.lib.de.johni0702.minecraft.gui.element.GuiElement;
+import com.replaymod.pathing.properties.TimestampProperty;
 import com.replaymod.replay.gui.screen.GuiReplayViewer;
-import com.replaymod.replaystudio.pathing.path.Keyframe;
+import com.replaymod.replaystudio.pathing.impl.KeyframeImpl;
+import com.replaymod.replaystudio.pathing.impl.PathImpl;
 import com.replaymod.replaystudio.pathing.path.Path;
+import com.replaymod.replaystudio.pathing.path.PathSegment;
 import com.replaymod.replaystudio.pathing.path.Timeline;
+import com.replaymod.replaystudio.replay.ReplayMetaData;
 import com.replaymod.replaystudio.replay.ZipReplayFile;
 import com.replaymod.replaystudio.studio.ReplayStudio;
-import com.replaymod.replaystudio.util.Property;
 import com.replaymod.simplepathing.SPTimeline;
 import net.rober.ReplayInterpolator;
 import org.spongepowered.asm.mixin.Final;
@@ -19,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 
@@ -34,22 +37,22 @@ public class ReplayScreenMixin {
             for (GuiReplayViewer.GuiReplayEntry entry : list.getSelected()) {
                 try {
                     ZipReplayFile replay = new ZipReplayFile(new ReplayStudio(),entry.file);
-					Map<String, Timeline> map = replay.getTimelines(new SPTimeline());
-					ReplayInterpolator.LOGGER.info(map.entrySet().size());
-					map.keySet().forEach((String s)-> {
-						ReplayInterpolator.LOGGER.info(s);
-                        for (Path path : map.get(s).getPaths()) {
-                            path.getKeyframes().iterator().forEachRemaining((Keyframe keyframe)-> {ReplayInterpolator.LOGGER.info(keyframe.getTime());
-							keyframe.getProperties().iterator().forEachRemaining((Property prop)-> {});
-							});
-                        }
-					});
+					ReplayInterpolator.LOGGER.info(replay.getMetaData().getDuration());
+					//SPTimeline SPTimeline = new SPTimeline();
+					//if(replay.getTimelines(new SPTimeline()).keySet().isEmpty())replay.getTimelines(SPTimeline).put("",SPTimeline.createTimeline());
+					SPTimeline SPtimeline = new SPTimeline(replay.getTimelines(new SPTimeline()).get(""));
+					SPtimeline.addTimeKeyframe(123,123);
+					ReplayMetaData metaData = replay.getMetaData();
+					metaData.getDuration();
+					
 
-                } catch (IOException e) {
+                } catch (Exception e) {
+					e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             }
-				}).setSize(73,20).setLabel("Interpolator");
+
+				}).setSize(150,20).setLabel("Interpolator");
 		GuiElement[] content = new GuiElement[]{(((GuiReplayViewer) (Object) this)).loadButton, interpolateButton};
 		args.set(1,content);
 	}
