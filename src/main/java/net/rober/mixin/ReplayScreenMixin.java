@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,23 +35,20 @@ public class ReplayScreenMixin {
 	@ModifyArgs(method = "<init>", at = @At(value="INVOKE",target = "Lcom/replaymod/lib/de/johni0702/minecraft/gui/container/GuiPanel;addElements(Lcom/replaymod/lib/de/johni0702/minecraft/gui/layout/LayoutData;[Lcom/replaymod/lib/de/johni0702/minecraft/gui/element/GuiElement;)Lcom/replaymod/lib/de/johni0702/minecraft/gui/container/AbstractGuiContainer;", ordinal = 0))
 	private void addButtonMixin(Args args) {
 		final GuiButton interpolateButton = new GuiButton().onClick(()-> {
+			HashMap<String, Integer> replaysDurations = new HashMap<>();
+			int durationsSum = 0;
             for (GuiReplayViewer.GuiReplayEntry entry : list.getSelected()) {
                 try {
-                    ZipReplayFile replay = new ZipReplayFile(new ReplayStudio(),entry.file);
-					ReplayInterpolator.LOGGER.info(replay.getMetaData().getDuration());
-					//SPTimeline SPTimeline = new SPTimeline();
-					//if(replay.getTimelines(new SPTimeline()).keySet().isEmpty())replay.getTimelines(SPTimeline).put("",SPTimeline.createTimeline());
-					SPTimeline SPtimeline = new SPTimeline(replay.getTimelines(new SPTimeline()).get(""));
-					SPtimeline.addTimeKeyframe(123,123);
-					ReplayMetaData metaData = replay.getMetaData();
-					metaData.getDuration();
-					
+                    ZipReplayFile replayFile = new ZipReplayFile(new ReplayStudio(),entry.file);
+					int replayDuration = replayFile.getMetaData().getDuration();
+					replaysDurations.put(entry.file.getName(),replayDuration);
+					durationsSum+=replayDuration;
 
-                } catch (Exception e) {
-					e.printStackTrace();
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
+
 
 				}).setSize(150,20).setLabel("Interpolator");
 		GuiElement[] content = new GuiElement[]{(((GuiReplayViewer) (Object) this)).loadButton, interpolateButton};
