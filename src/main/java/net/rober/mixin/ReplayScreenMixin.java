@@ -10,6 +10,7 @@ import com.replaymod.replaystudio.pathing.path.Keyframe;
 import com.replaymod.replaystudio.pathing.path.Path;
 import com.replaymod.replaystudio.pathing.path.PathSegment;
 import com.replaymod.replaystudio.pathing.path.Timeline;
+import com.replaymod.replaystudio.pathing.serialize.TimelineSerialization;
 import com.replaymod.replaystudio.replay.ReplayMetaData;
 import com.replaymod.replaystudio.replay.ZipReplayFile;
 import com.replaymod.replaystudio.studio.ReplayStudio;
@@ -44,7 +45,8 @@ public class ReplayScreenMixin {
 					SPTimeline spTimeline = new SPTimeline(replayfile.getTimelines(new SPTimeline()).get(""));
 					spTimeline.addTimeKeyframe(123,123);
 					replayfile.writeTimelines(spTimeline,new HashMap<>(Map.of("",spTimeline.getTimeline())));
-					replayfile.write("timelines.json");
+					TimelineSerialization serializer = new TimelineSerialization(spTimeline,replayfile);
+					serializer.save(new HashMap<>(Map.of("",spTimeline.getTimeline())));
 					replayfile.saveTo(new File(entry.file.getPath()+".asd.mcpr"));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
