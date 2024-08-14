@@ -30,13 +30,14 @@ public class ReplayScreenMixin {
 		final GuiButton interpolateButton = new GuiButton().onClick(()-> {
 			List<GuiReplayViewer.GuiReplayEntry> selected = list.getSelected();
 			HashMap<String, Long> replaysDurations = new HashMap<>();
-			int durationsSum = 0;
+			long durationsSum = 0;
             for (GuiReplayViewer.GuiReplayEntry entry : selected) {
                 try {
                     ZipReplayFile replayFile = new ZipReplayFile(new ReplayStudio(),entry.file);
 					long replayDuration = ((long) replayFile.getMetaData().getDuration())-3000L;
 					replaysDurations.put(entry.file.getName(),replayDuration);
 					durationsSum+=replayDuration;
+					replayFile.close();
 
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -61,6 +62,7 @@ public class ReplayScreenMixin {
 				else {
 					throw new RuntimeException("There isn't any camera keyframes to get the duration in the first replay");
 				}
+				replayFile.close();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -71,7 +73,7 @@ public class ReplayScreenMixin {
                 try {
                     ZipReplayFile replay = new ZipReplayFile(new ReplayStudio(),entry.file);
 					long replayDuration = replaysDurations.get(entry.file.getName());
-					double timelapseDuration = (double) replayDuration / (double )durationsSum * finalDuration;
+					long timelapseDuration = (long) ((double)replayDuration / ((double) durationsSum) * ((double) finalDuration));
 					SPTimeline spTimeline = new SPTimeline();
 					if(isFirst) {
 						cameraTimeline = replay.getTimelines(new SPTimeline()).get("");
@@ -80,15 +82,17 @@ public class ReplayScreenMixin {
                     }
                     spTimeline = new SPTimeline(cameraTimeline);
                     spTimeline.addTimeKeyframe(timePassed,3000);
-					timePassed+= (long) timelapseDuration;
+					timePassed+= timelapseDuration;
 					spTimeline.addTimeKeyframe(timePassed, (int) (replayDuration+3000));
 					replay.writeTimelines(spTimeline,new HashMap<>(Map.of("",cameraTimeline)));
 					replay.save();
+					spTimeline.removeTimeKeyframe(timePassed-timelapseDuration);
+					spTimeline.removeTimeKeyframe(timePassed);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 			}
-			
+
 				}).setSize(150,20).setLabel("Interpolator");
 		GuiElement[] content = new GuiElement[]{(((GuiReplayViewer) (Object) this)).loadButton, interpolateButton};
 		args.set(1,content);
