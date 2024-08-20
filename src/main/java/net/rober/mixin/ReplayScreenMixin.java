@@ -4,6 +4,7 @@ import com.replaymod.lib.de.johni0702.minecraft.gui.element.GuiButton;
 import com.replaymod.lib.de.johni0702.minecraft.gui.element.GuiElement;
 import com.replaymod.replay.gui.screen.GuiReplayViewer;
 import com.replaymod.replaystudio.pathing.path.Keyframe;
+import com.replaymod.replaystudio.pathing.path.Path;
 import com.replaymod.replaystudio.pathing.path.Timeline;
 import com.replaymod.replaystudio.replay.ZipReplayFile;
 import com.replaymod.replaystudio.studio.ReplayStudio;
@@ -47,7 +48,6 @@ public class ReplayScreenMixin {
 			try {
 				GuiReplayViewer.GuiReplayEntry entry = list.getSelected().get(0);
 				ZipReplayFile replayFile = new ZipReplayFile(new ReplayStudio(),entry.file);
-				ReplayInterpolator.LOGGER.info(replayFile.getMetaData().getDuration());
 				Timeline timeline = replayFile.getTimelines(new SPTimeline()).get("");
 				SPTimeline spTimeline = new SPTimeline(timeline);
 				Collection<Keyframe> keyframes = spTimeline.getPath(SPTimeline.SPPath.POSITION).getKeyframes();
@@ -81,6 +81,17 @@ public class ReplayScreenMixin {
 
                     }
                     spTimeline = new SPTimeline(cameraTimeline);
+					Path timePath = spTimeline.getPath(SPTimeline.SPPath.TIME);
+					if(!timePath.getKeyframes().isEmpty()){
+						List<Long> toDelete = new LinkedList<>();
+						for (Keyframe keyframe : timePath.getKeyframes()) {
+							toDelete.add(keyframe.getTime());
+						}
+						for (Long l : toDelete) {
+							spTimeline.removeTimeKeyframe(l);
+						}
+
+					}
                     spTimeline.addTimeKeyframe(timePassed,3000);
 					timePassed+= timelapseDuration;
 					spTimeline.addTimeKeyframe(timePassed, (int) (replayDuration+3000));
