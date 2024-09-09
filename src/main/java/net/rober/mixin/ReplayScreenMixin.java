@@ -9,7 +9,6 @@ import com.replaymod.replaystudio.pathing.path.Timeline;
 import com.replaymod.replaystudio.replay.ZipReplayFile;
 import com.replaymod.replaystudio.studio.ReplayStudio;
 import com.replaymod.simplepathing.SPTimeline;
-import net.rober.ReplayInterpolator;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,9 +23,9 @@ import java.util.*;
 @Mixin(GuiReplayViewer.class)
 public class ReplayScreenMixin {
 
-	@Shadow @Final public GuiReplayViewer.GuiReplayList list;
+	@Shadow(remap = false) @Final public GuiReplayViewer.GuiReplayList list;
 
-	@ModifyArgs(method = "<init>", at = @At(value="INVOKE",target = "Lcom/replaymod/lib/de/johni0702/minecraft/gui/container/GuiPanel;addElements(Lcom/replaymod/lib/de/johni0702/minecraft/gui/layout/LayoutData;[Lcom/replaymod/lib/de/johni0702/minecraft/gui/element/GuiElement;)Lcom/replaymod/lib/de/johni0702/minecraft/gui/container/AbstractGuiContainer;", ordinal = 0))
+	@ModifyArgs(method = "<init>", at = @At(value="INVOKE",target = "Lcom/replaymod/lib/de/johni0702/minecraft/gui/container/GuiPanel;addElements(Lcom/replaymod/lib/de/johni0702/minecraft/gui/layout/LayoutData;[Lcom/replaymod/lib/de/johni0702/minecraft/gui/element/GuiElement;)Lcom/replaymod/lib/de/johni0702/minecraft/gui/container/AbstractGuiContainer;", ordinal = 0, remap=false ),remap = false)
 	private void addButtonMixin(Args args) {
 		final GuiButton interpolateButton = new GuiButton().onClick(()-> {
 			List<GuiReplayViewer.GuiReplayEntry> selected = list.getSelected();
@@ -99,10 +98,9 @@ public class ReplayScreenMixin {
 					replay.save();
 					spTimeline.removeTimeKeyframe(timePassed-timelapseDuration);
 					spTimeline.removeTimeKeyframe(timePassed);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (IOException ignored) {
                 }
-			}
+            }
 
 				}).setSize(150,20).setLabel("Interpolator");
 		GuiElement[] content = new GuiElement[]{(((GuiReplayViewer) (Object) this)).loadButton, interpolateButton};
