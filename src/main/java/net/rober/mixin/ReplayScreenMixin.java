@@ -43,7 +43,7 @@ public class ReplayScreenMixin {
                     throw new RuntimeException(e);
                 }
             }
-			long finalDuration = 10000; //Initialize to don't mess up
+			long finalDuration;
 			try {
 				GuiReplayViewer.GuiReplayEntry entry = list.getSelected().get(0);
 				ZipReplayFile replayFile = new ZipReplayFile(new ReplayStudio(),entry.file);
@@ -73,7 +73,7 @@ public class ReplayScreenMixin {
                     ZipReplayFile replay = new ZipReplayFile(new ReplayStudio(),entry.file);
 					long replayDuration = replaysDurations.get(entry.file.getName());
 					long timelapseDuration = (long) ((double)replayDuration / ((double) durationsSum) * ((double) finalDuration));
-					SPTimeline spTimeline = new SPTimeline();
+					SPTimeline spTimeline;
 					if(isFirst) {
 						cameraTimeline = replay.getTimelines(new SPTimeline()).get("");
 						isFirst=false;
@@ -91,7 +91,7 @@ public class ReplayScreenMixin {
 						}
 
 					}
-                    spTimeline.addTimeKeyframe(timePassed,3000);
+                    spTimeline.addTimeKeyframe(timePassed,0);
 					timePassed+= timelapseDuration;
 					spTimeline.addTimeKeyframe(timePassed, (int) (replayDuration+3000));
 					replay.writeTimelines(spTimeline,new HashMap<>(Map.of("",cameraTimeline)));
