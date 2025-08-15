@@ -91,7 +91,7 @@ public class ReplayScreenMixin {
 						}
 
 					}
-                    spTimeline.addTimeKeyframe(timePassed,0);
+                    spTimeline.addTimeKeyframe(timePassed,3000);
 					timePassed+= timelapseDuration;
 					spTimeline.addTimeKeyframe(timePassed, (int) (replayDuration+3000));
 					replay.writeTimelines(spTimeline,new HashMap<>(Map.of("",cameraTimeline)));
@@ -103,7 +103,7 @@ public class ReplayScreenMixin {
             }
 
 				}).setSize(150,20).setLabel("Interpolator");
-		GuiElement[] content = new GuiElement[]{(((GuiReplayViewer) (Object) this)).loadButton, interpolateButton};
+		GuiElement<?>[] content = new GuiElement[]{(((GuiReplayViewer) (Object) this)).loadButton, interpolateButton};
 		args.set(1,content);
 	}
 }

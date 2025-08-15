@@ -1,11 +1,12 @@
 {
-	"required": true,
-	"package": "net.rober.mixin",
-	"compatibilityLevel": "JAVA_16",
-	"mixins": [
-		"ReplayScreenMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "net.rober.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "ReplayScreenMixin",
+    "VideoRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }
